@@ -1,0 +1,58 @@
+Comprendre le Processus de Web Scraping
+Avant de plonger dans le code, il est important de comprendre les étapes générales du web scraping :
+Identifier la cible: Déterminez précisément les données que vous souhaitez extraire (prix de l'or, date, source, etc.) et le site web où elles se trouvent.
+Analyser la structure HTML: Utilisez les outils de votre navigateur (Inspect Element) pour comprendre comment les données sont organisées dans le code HTML de la page.
+Choisir les outils: Python est un excellent choix pour le web scraping grâce à des bibliothèques comme Beautiful Soup et Requests.
+Écrire le script: Créez un script Python qui :
+Fait une requête HTTP pour récupérer la page web.
+Analyse le contenu HTML à l'aide de Beautiful Soup pour trouver les éléments contenant les données souhaitées.
+Extrait les données et les formate comme vous le souhaitez.
+Envoie les données par email.
+Script Python
+Il suppose que le prix de l'or est contenu dans une balise <span> avec une classe spécifique. Vous devrez adapter ce script au site web que vous ciblez en modifiant les sélecteurs CSS.
+Python
+import requests
+from bs4 import BeautifulSoup
+import smtplib
+from email.mime.text import MIMEText
+
+def send_email(price):
+    # Remplacez par vos informations d'authentification SMTP
+    sender_email = "votre_email@exemple.com"
+    receiver_email = "votre_email@exemple.com"
+    password = "votre_mot_de_passe"
+
+    message = MIMEText(f"Le prix de l'or est actuellement : {price}")
+    message['From'] = sender_email
+    message['To'] = receiver_email
+    message['Subject'] = "Prix de l'or"
+
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.starttls()
+        smtp.login(sender_email, password)
+        smtp.sendmail(sender_email, receiver_email, message.as_string())
+
+def scrape_gold_price():
+    url = "https://www.votresiteweb.com/prix-or"  # Remplacez par l'URL du site
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Adaptez ce sélecteur CSS à la structure de la page
+    price_element = soup.find('span', class_='prix-or')
+    if price_element:
+        price = price_element.text.strip()
+        send_email(price)
+    else:
+        print("Impossible de trouver le prix de l'or.")
+
+if __name__ == "__main__":
+    scrape_gold_price()
+Points clés à retenir:
+Sélecteurs CSS: Apprenez à utiliser les sélecteurs CSS pour cibler les éléments HTML spécifiques que vous souhaitez extraire.
+Respect des robots.txt: Assurez-vous de respecter le fichier robots.txt du site pour éviter d'être bloqué.
+Éthique: Utilisez le web scraping de manière responsable et évitez de surcharger les serveurs.
+Conseils supplémentaires:
+Utilisez un environnement virtuel: Cela vous permettra d'isoler les dépendances de votre projet.
+Gérez les exceptions: Implémentez des blocs try-except pour gérer les erreurs potentielles.
+Enregistrez les données: Enregistrez les données extraites dans un fichier CSV ou une base de données pour une analyse ultérieure.
+Planifiez l'exécution: Utilisez des outils comme cron (sur Linux) ou Task Scheduler (sur Windows) pour exécuter votre script régulièrement.
